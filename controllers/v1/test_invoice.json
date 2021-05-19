@@ -1,0 +1,16 @@
+[
+    {
+        "seller_id": 1,
+        "shipping_cost": 10000,
+        "shipping_courier": "jne",
+        "products": [
+            {
+                "product_id": 1,
+                "quantity": 1,
+                "price":10000,
+                "total_price": 10000,
+                "total_weight":100
+            }
+        ]
+    }
+]
