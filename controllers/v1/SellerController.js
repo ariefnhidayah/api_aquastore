@@ -352,7 +352,7 @@ module.exports = {
         s.address,
         p.name as province,
         CONCAT(c.type, " ", c.name) as city,
-        CONCAT("Kecamatan ", d.name) as district,
+        d.name as district,
         s.postcode,
         CONCAT(s.address, ", Kec. ", d.name, ", ", c.type, " ", c.name, ", ", p.name, " ", s.postcode) as full_address,
         s.latitude,
