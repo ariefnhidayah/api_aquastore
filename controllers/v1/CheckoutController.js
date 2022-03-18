@@ -236,6 +236,7 @@ module.exports = {
                                     }
                                 })
                             }).catch(err => {
+                                await transaction.rollback()
                                 return res.status(503).json({
                                     status: 'error',
                                     message: err.message
@@ -245,7 +246,8 @@ module.exports = {
                             await Cart.destroy({
                                 where: {
                                     user_id: user.id
-                                }
+                                },
+                                transaction: transaction
                             })
                             await transaction.commit()
                             return res.json({
