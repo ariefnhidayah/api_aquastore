@@ -65,217 +65,68 @@ module.exports = {
 
         let offset = (page - 1) * limit
 
-        if (city && province) {
-            if (!category) {
-                products = await Product.findAll({
-                    where: {
-                        status: 1,
+        products = await Product.findAll({
+            where: {
+                [Op.and]: [
+                    {status: 1},
+                    {
                         name: {
                             [Op.like]: `%${q}%`
                         },
-                        id: {
-                            [Op.not]: detail ? detail : false
-                        }
                     },
-                    offset: offset,
-                    limit: Number(limit),
-                    order: [
-                        ['id', 'desc']
-                    ],
-                    include: [
-                        {
-                            model: Category,
-                            attributes: ['name'],
-                            where: {
-                                status: 1
-                            }
-                        },
-                        {
-                            model: Seller,
-                            attributes: ['store_name', 'courier'],
-                            where: {
-                                status: 'active',
-                                [Op.or]: [
-                                    {
-                                        city_id: city
-                                    },
-                                    {
-                                        province_id: province
-                                    }
-                                ]
-                            },
-                            include: [
-                                {
-                                    model: City,
-                                    attributes: ['type', 'name']
-                                },
-                                {
-                                    model: Province,
-                                    attributes: ['name']
-                                }
-                            ]
+                    detail ? {
+                        id: {
+                            [Op.not]: detail
                         }
-                    ]
-                })
-            } else {
-                products = await Product.findAll({
+                    } : {},
+                    category ? {
+                        category_id: category
+                    } : {},
+                    seller_id ? {
+                        seller_id: seller_id
+                    } : {}
+                ],
+            },
+            offset: offset,
+            limit: Number(limit),
+            order: [
+                ['id', 'desc']
+            ],
+            include: [
+                {
+                    model: Category,
+                    attributes: ['name'],
                     where: {
-                        status: 1,
-                        category_id: category,
-                        name: {
-                            [Op.like]: `%${q}%`
-                        },
-                        id: {
-                            [Op.not]: detail ? detail : false
-                        }
-                    },
-                    offset: offset,
-                    limit: Number(limit),
-                    order: [
-                        ['id', 'desc']
-                    ],
-                    include: [
-                        {
-                            model: Category,
-                            attributes: ['name'],
-                            where: {
-                                status: 1
-                            }
-                        },
-                        {
-                            model: Seller,
-                            attributes: ['store_name', 'courier'],
-                            where: {
-                                status: 'active',
-                                [Op.or]: [
-                                    {
-                                        city_id: city
-                                    },
-                                    {
-                                        province_id: province
-                                    }
-                                ]
-                            },
-                            include: [
-                                {
-                                    model: City,
-                                    attributes: ['type', 'name']
-                                },
-                                {
-                                    model: Province,
-                                    attributes: ['name']
-                                }
-                            ]
-                        }
-                    ]
-                })
-            }
-        } else {
-            if (!category) {
-                products = await Product.findAll({
+                        status: 1
+                    }
+                },
+                {
+                    model: Seller,
+                    attributes: ['store_name', 'courier'],
                     where: {
                         [Op.and]: [
-                            {
-                                status: 1,
-                                name: {
-                                    [Op.like]: `%${q}%`
-                                },
-                                id: {
-                                    [Op.not]: detail ? detail : false
-                                }
-                            },
-                            seller_id ? {
-                                seller_id: seller_id
-                            } : {}
-                        ]
+                            {status: 'active'},
+                            city ? {
+                                city_id: city
+                            } : {},
+                            province ? {
+                                province_id: province
+                            } : {},
+                        ],
                     },
-                    offset: offset,
-                    limit: Number(limit),
-                    order: [
-                        ['id', 'desc']
-                    ],
                     include: [
                         {
-                            model: Category,
-                            attributes: ['name'],
-                            where: {
-                                status: 1
-                            }
+                            model: City,
+                            attributes: ['type', 'name'],
                         },
                         {
-                            model: Seller,
-                            attributes: ['store_name', 'courier'],
-                            where: {
-                                status: 'active',
-                            },
-                            include: [
-                                {
-                                    model: City,
-                                    attributes: ['type', 'name']
-                                },
-                                {
-                                    model: Province,
-                                    attributes: ['name']
-                                }
-                            ]
+                            model: Province,
+                            attributes: ['name']
                         }
                     ]
-                })
-            } else {
-                products = await Product.findAll({
-                    where: {
-                        [Op.and]: [
-                            {
-                                status: 1,
-                                category_id: category,
-                                name: {
-                                    [Op.like]: `%${q}%`
-                                },
-                                id: {
-                                    [Op.not]: detail ? detail : false
-                                },
-                            },
-                            seller_id ? {
-                                seller_id: seller_id
-                            } : {}
-                        ]
-                    },
-                    offset: offset,
-                    limit: Number(limit),
-                    order: [
-                        ['id', 'desc']
-                    ],
-                    include: [
-                        {
-                            model: Category,
-                            attributes: ['name'],
-                            where: {
-                                status: 1
-                            }
-                        },
-                        {
-                            model: Seller,
-                            attributes: ['store_name', 'courier'],
-                            where: {
-                                status: 'active',
-                            },
-                            include: [
-                                {
-                                    model: City,
-                                    attributes: ['type', 'name']
-                                },
-                                {
-                                    model: Province,
-                                    attributes: ['name']
-                                }
-                            ]
-                        }
-                    ]
-                })
-            }
-        }
-
-
+                }
+            ]
+        })
         return res.json({
             status: 'success',
             data: products
