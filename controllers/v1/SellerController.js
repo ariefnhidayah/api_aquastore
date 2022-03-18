@@ -380,7 +380,7 @@ module.exports = {
         const sellers = await sequelize.query(query, {type: QueryTypes.SELECT, nest: true})
         return res.json({
             status: "success",
-            location: {lng, lat},
+            location: {lat,lng},
             data: sellers
         })
     }
