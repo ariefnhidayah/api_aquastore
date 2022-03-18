@@ -137,14 +137,14 @@ module.exports = {
                         due_date: dateUtils.getDueDate(2),
                         snap_url: '',
                     }
-                    const transaction = sequelize.transaction()
+                    const transaction = await sequelize.transaction()
                     try {
                         const order = await Order.create(data_order_create, {
                             transaction: transaction
                         })
                         if (order) {
                             let itemDetails = [];
-                            invoices.map(async (invoice) => {
+                            for(const invoice of invoices) {
                                 let invSubtotal = 0
                                 const products = invoice.products
                                 for(let i = 0; i < products.length; i++) {
@@ -171,7 +171,7 @@ module.exports = {
                                     },{
                                         transaction: transaction
                                     })
-                                    products.map(async (product) => {
+                                    for(const product of products) {
                                         const prod = await Product.findByPk(product.product_id)
                                         const data_product_create = {
                                             product_id: product.product_id,
@@ -196,28 +196,29 @@ module.exports = {
                                             quantity: product.quantity,
                                             category: 'Product'
                                         })
-                                    })
+                                    }
                                 }
-                            })
-                            const customerDetails = {
-                                first_name: user.name,
-                                email: user.email,
-                                phone: user.phone,
                             }
-                            const transactionDetails = {
-                                order_id: order.code,
-                                gross_amount: order.total_plus_tax
-                            }
-                            const midtransParams = {
-                                transaction_details: transactionDetails,
-                                // item_details: itemDetails,
-                                customer_details: customerDetails
-                            }
+                            // const customerDetails = {
+                            //     first_name: user.name,
+                            //     email: user.email,
+                            //     phone: user.phone,
+                            // }
+                            // const transactionDetails = {
+                            //     order_id: order.code,
+                            //     gross_amount: order.total_plus_tax
+                            // }
+                            // const midtransParams = {
+                            //     transaction_details: transactionDetails,
+                            //     // item_details: itemDetails,
+                            //     customer_details: customerDetails
+                            // }
     
+                            /*
                             const snap = orderUtils.configMidtrans()
-                            snap.createTransaction(midtransParams).then(async(transaction) => {
+                            snap.createTransaction(midtransParams).then(async(trf) => {
                                 await order.update({
-                                    snap_url: transaction.redirect_url
+                                    snap_url: trf.redirect_url
                                 },{
                                     transaction: transaction
                                 })
@@ -226,11 +227,12 @@ module.exports = {
                                         user_id: user.id
                                     }
                                 })
+                                await transaction.commit()
                                 return res.json({
                                     status: 'success',
                                     data: {
                                         code: order.code,
-                                        url: transaction.redirect_url
+                                        url: trf.redirect_url
                                     }
                                 })
                             }).catch(err => {
@@ -238,6 +240,20 @@ module.exports = {
                                     status: 'error',
                                     message: err.message
                                 })
+                            })
+                            */
+                            await Cart.destroy({
+                                where: {
+                                    user_id: user.id
+                                }
+                            })
+                            await transaction.commit()
+                            return res.json({
+                                status: 'success',
+                                data: {
+                                    code: order.code,
+                                    // url: "google.com"
+                                }
                             })
                         } else {
                             return res.status(409).json({
@@ -288,7 +304,10 @@ module.exports = {
                 ]
             }
         ]
-        return res.json(invoices)
+        return res.json({
+            inv: invoices,
+            string: JSON.stringify(invoices)
+        })
     },
     check_product: async (req, res) => {
         const products = JSON.parse(req.body.products)

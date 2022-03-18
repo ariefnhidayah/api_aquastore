@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken')
 const { JWT_SECRET } = process.env
 
 module.exports = async (req, res, next) => {
-    console.log(true)
     const token = req.headers.authorization
     jwt.verify(token, JWT_SECRET, async (error, decoded) => {
         if (error) {
