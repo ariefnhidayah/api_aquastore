@@ -357,6 +357,7 @@ module.exports = {
         CONCAT(s.address, ", Kec. ", d.name, ", ", c.type, " ", c.name, ", ", p.name, " ", s.postcode) as full_address,
         s.latitude,
         s.longitude,
+        s.seo_url,
         (
             6371 * (
                 2 * atan2(

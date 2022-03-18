@@ -20,7 +20,8 @@ module.exports = {
         latitude: '-6.198736291269754',
         longitude: '106.82601410402005',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
+        seo_url: 'toko-ikan-hias-satibiahmad-' + Date.now()
       },
       {
         name: 'Kreasi Akuarium',
@@ -38,7 +39,8 @@ module.exports = {
         latitude: '-6.19882162927586',
         longitude: '106.82584243878668',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
+        seo_url: 'kreasi-aquarium-' + Date.now()
       },
       {
         name: 'H. Mahmud',
@@ -56,7 +58,8 @@ module.exports = {
         latitude: '-6.212132537471454',
         longitude: '106.84060536797806',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
+        seo_url: 'ikan-hias-menteng-h-mahmud-' + Date.now()
       },
       {
         name: 'Fantasi Koi',
@@ -74,7 +77,8 @@ module.exports = {
         latitude: '-6.2004346218565205',
         longitude: '106.82625187343359',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
+        seo_url: 'fantasi-koi-' + Date.now()
       },
       {
         name: 'AQUANDA',
@@ -92,7 +96,8 @@ module.exports = {
         latitude: '-6.199930837165259',
         longitude: '106.82738749241113',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
+        seo_url: 'aquanda-' + Date.now()
       },
       {
         name: 'Jaya Aquarium',
@@ -110,7 +115,8 @@ module.exports = {
         latitude: '-6.197627010068328',
         longitude: '106.82592823670811',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
+        seo_url: 'jaya-aquarium-' + Date.now()
       },
       {
         name: 'Sentra Ikan Hias',
@@ -128,7 +134,8 @@ module.exports = {
         latitude: '-6.193934360815534',
         longitude: '106.80027381870939',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
+        seo_url: 'sentra-ikan-hias-' + Date.now()
       },
       {
         name: 'Titian Aquatic Freshwater Tropical Fish',
@@ -146,7 +153,8 @@ module.exports = {
         latitude: '-6.176906856304764',
         longitude: '106.859665494716',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
+        seo_url: 'titian-aquatic-freshwater-tropical-fish-' + Date.now()
       },
       {
         name: 'Aquaman',
@@ -164,7 +172,8 @@ module.exports = {
         latitude: '-6.233784467135024',
         longitude: '106.6631096049681',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
+        seo_url: 'aquaman-' + Date.now()
       },
       {
         name: 'Roni',
@@ -182,7 +191,8 @@ module.exports = {
         latitude: '-6.214970596229425',
         longitude: '106.76259156232791',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
+        seo_url: 'roni-aquascape-' + Date.now()
       },
       {
         name: 'Prima Aquarium',
@@ -200,7 +210,8 @@ module.exports = {
         latitude: '-6.2547983752753895',
         longitude: '106.76891934361588',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
+        seo_url: 'primar-aquarium-' + Date.now()
       },
       {
         name: 'Latansya',
@@ -218,7 +229,8 @@ module.exports = {
         latitude: '-6.318096326782832',
         longitude: '106.83638703973854',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
+        seo_url: 'latansya-aquarium-' + Date.now()
       },
       {
         name: 'Kirana',
@@ -236,7 +248,8 @@ module.exports = {
         latitude: '-6.338097936456792',
         longitude: '106.85269206832184',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
+        seo_url: 'kirana-aquarium-' + Date.now()
       },
       {
         name: 'REF - Ron\'\s Exotic Fish',
@@ -254,7 +267,8 @@ module.exports = {
         latitude: '-6.13825302997789',
         longitude: '106.91689398770234',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
+        seo_url: 'ref-ron-exotic-fish-' + Date.now()
       },
     ], {});
   },
