@@ -271,8 +271,8 @@ module.exports = {
         const invoices = [
             {
                 // code: orderUtils.create_invoice_code(),
-                seller_id: 3,
-                shipping_cost: 63000,
+                seller_id: 31,
+                shipping_cost: 6000,
                 // total: invSubtotal + Number(invoice.shipping_cost),
                 shipping_courier: 'jne-oke',
                 // status: 0,
@@ -288,9 +288,7 @@ module.exports = {
                 ]
             }
         ]
-        return res.json({
-            data: invoices
-        })
+        return res.json(invoices)
     },
     check_product: async (req, res) => {
         const products = JSON.parse(req.body.products)
