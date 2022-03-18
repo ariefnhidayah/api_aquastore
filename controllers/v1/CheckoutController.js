@@ -280,7 +280,7 @@ module.exports = {
                 products: [
                     {
                         product_id: 2,
-                        quantity: 2,
+                        quantity: 1,
                         // price: product.price,
                         // subtotal: product.total_price,
                         // total_weight: product.total_weight
