@@ -337,14 +337,48 @@ module.exports = {
         const location = await HereLocation.geocode(address)
         const {lat, lng} = location.position
 
+        /*
         const query = `SELECT 
-                (((acos(sin(("${lat}"*pi()/180)) * sin((latitude*pi()/180)) + cos(("${lat}"*pi()/180)) * cos((latitude*pi()/180)) * cos((("${lng}"- longitude) * pi()/180)))) * 180/pi()) * 60 * 1.1515 * 1.609344) as distance,
-                sellers.*
-        FROM sellers WHERE status = 'active' ORDER BY distance ASC LIMIT 20`;
+            sellers.*, (((acos(sin(("${lat}"*pi()/180)) * sin((latitude*pi()/180)) + cos(("${lat}"*pi()/180)) * cos((latitude*pi()/180)) * cos((("${lng}"- longitude) * pi()/180)))) * 180/pi()) * 60 * 1.1515 * 1.609344) as distance
+        FROM sellers WHERE status = 'active' LIMIT 20`;
+        */
+
+        const query = `SELECT
+        s.id, 
+        s.name,
+        s.store_name,
+        s.phone,
+        s.courier,
+        s.address,
+        p.name as province,
+        CONCAT(c.type, " ", c.name) as city,
+        CONCAT("Kecamatan ", d.name) as district,
+        s.postcode,
+        CONCAT(s.address, " Kec. ", d.name, ", ", c.type, " ", c.name, ", ", p.name, " ", s.postcode) as full_address,
+        (
+            6371 * (
+                2 * atan2(
+                    sqrt(
+                        sin( ( ( s.latitude * ( pi() / 180 ) - ( '${lat}' * ( pi() / 180 )) ) ) / 2 ) * sin( ( ( s.latitude * ( pi() / 180 ) - ( '${lat}' * ( pi() / 180 )) ) ) / 2 ) + cos((
+                                '${lat}' * ( pi() / 180 ))) * cos((
+                            s.latitude * ( pi() / 180 ))) * sin( ( ( s.longitude * ( pi() / 180 ) - ( '${lng}' * ( pi() / 180 )) ) ) / 2 ) * sin( ( ( s.longitude * ( pi() / 180 ) - ( '${lng}' * ( pi() / 180 )) ) ) / 2 ) 
+                    ),
+                    sqrt(
+                        1 - (
+                            sin( ( ( s.latitude * ( pi() / 180 ) - ( '${lat}' * ( pi() / 180 )) ) ) / 2 ) * sin( ( ( s.latitude * ( pi() / 180 ) - ( '${lat}' * ( pi() / 180 )) ) ) / 2 ) + cos((
+                                    '${lat}' * ( pi() / 180 ))) * cos((
+                                s.latitude * ( pi() / 180 ))) * sin( ( ( s.longitude * ( pi() / 180 ) - ( '${lng}' * ( pi() / 180 )) ) ) / 2 ) * sin( ( ( s.longitude * ( pi() / 180 ) - ( '${lng}' * ( pi() / 180 )) ) ) / 2 )) 
+                    )))) as distance 
+            FROM sellers s
+            left join provincies p on p.id = s.province_id
+            left join cities c on c.id = s.city_id
+            left join districts d on d.id = s.district_id
+            where s.status = 'active' order by distance asc limit 20`;
 
         const sellers = await sequelize.query(query, {type: QueryTypes.SELECT, nest: true})
         return res.json({
             status: "success",
+            location: {lng, lat},
             data: sellers
         })
     }
