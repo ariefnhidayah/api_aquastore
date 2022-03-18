@@ -354,7 +354,7 @@ module.exports = {
         CONCAT(c.type, " ", c.name) as city,
         CONCAT("Kecamatan ", d.name) as district,
         s.postcode,
-        CONCAT(s.address, " Kec. ", d.name, ", ", c.type, " ", c.name, ", ", p.name, " ", s.postcode) as full_address,
+        CONCAT(s.address, ", Kec. ", d.name, ", ", c.type, " ", c.name, ", ", p.name, " ", s.postcode) as full_address,
         s.latitude,
         s.longitude,
         (
@@ -380,7 +380,7 @@ module.exports = {
         const sellers = await sequelize.query(query, {type: QueryTypes.SELECT, nest: true})
         return res.json({
             status: "success",
-            location: {lat,lng},
+            location: location.position,
             data: sellers
         })
     }
