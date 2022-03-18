@@ -1,12 +1,15 @@
-const { Seller } = require('../../models')
+const { Seller, sequelize } = require('../../models')
 const bcrypt = require('bcrypt')
 const Validator = require('fastest-validator')
 const validator = new Validator()
 const jwt = require('jsonwebtoken')
 const number = require('../../utils/number')
 const mail = require('../../utils/email')
-
+const HereLocation = require('../../utils/here')
 const { JWT_SECRET_SELLER, JWT_ACCESS_TOKEN_EXPIRED } = process.env
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
+const QueryTypes = Sequelize.QueryTypes
 
 module.exports = {
     register: async (req, res) => {
@@ -313,5 +316,36 @@ module.exports = {
                 })
             }
         }
+    },
+
+    nearest_store: async (req, res) => {
+        const schema = {
+            address: "string|empty:false"
+        }
+
+        const validate = validator.validate(req.query, schema)
+
+        if (validate.length > 0) {
+            return res.status(400).json({
+                status: 'error',
+                message: validate
+            })
+        }
+
+        const { address } = req.query
+
+        const location = await HereLocation.geocode(address)
+        const {lat, lng} = location.position
+
+        const query = `SELECT 
+                (((acos(sin(("${lat}"*pi()/180)) * sin((latitude*pi()/180)) + cos(("${lat}"*pi()/180)) * cos((latitude*pi()/180)) * cos((("${lng}"- longitude) * pi()/180)))) * 180/pi()) * 60 * 1.1515 * 1.609344) as distance,
+                sellers.*
+        FROM sellers WHERE status = 'active' ORDER BY distance ASC LIMIT 20`;
+
+        const sellers = await sequelize.query(query, {type: QueryTypes.SELECT, nest: true})
+        return res.json({
+            status: "success",
+            data: sellers
+        })
     }
 }
