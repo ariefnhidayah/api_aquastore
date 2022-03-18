@@ -18,6 +18,7 @@ const checkoutRouter = require('./routes/checkout')
 const orderRouter = require('./routes/order')
 const callback = require('./routes/callback')
 const storeRouter = require('./routes/store')
+const nearestStore = require('./routes/nearest_store')
 
 const app = express();
 
@@ -39,7 +40,9 @@ app.use('/cart', cartRouter)
 app.use('/checkout', checkoutRouter)
 app.use('/order', orderRouter)
 app.use('/callback', callback)
-app.use('/nearest-store', storeRouter)
+app.use('/store', storeRouter)
+app.use('/nearest-store', nearestStore)
+
 
 var debug = require('debug')('api:server');
 var http = require('http');

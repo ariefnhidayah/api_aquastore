@@ -10,7 +10,8 @@ const {
     City,
     Province,
     District,
-    OrderLog
+    OrderLog,
+    sequelize
 } = require("../../models");
 
 const Validator = require('fastest-validator')

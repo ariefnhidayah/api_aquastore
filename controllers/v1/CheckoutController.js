@@ -7,7 +7,8 @@ const {
   Product,
   Seller,
   OrderHistory,
-  Category
+  Category,
+  sequelize
 } = require("../../models");
 const axios = require("axios");
 const dateUtils = require('../../utils/date')
@@ -136,98 +137,119 @@ module.exports = {
                         due_date: dateUtils.getDueDate(2),
                         snap_url: '',
                     }
-                    const order = await Order.create(data_order_create)
-                    if (order) {
-                        let itemDetails = [];
-                        invoices.map(async (invoice) => {
-                            let invSubtotal = 0
-                            const products = invoice.products
-                            for(let i = 0; i < products.length; i++) {
-                                const get_prod = await Product.findByPk(products[i].product_id)
-                                invSubtotal += Number(get_prod.price) * Number(products[i].quantity)
-                            }
-                            const data_invoice_create = {
-                                code: orderUtils.create_invoice_code(),
-                                seller_id: invoice.seller_id,
-                                subtotal: invSubtotal,
-                                shipping_cost: invoice.shipping_cost,
-                                total: invSubtotal + Number(invoice.shipping_cost),
-                                shipping_courier: invoice.shipping_courier,
-                                status: 0,
-                                order_id: order.id,
-                            }
-                            const order_invoice = await OrderInvoice.create(data_invoice_create)
-                            if (order_invoice) {
-                                await OrderHistory.create({
-                                    invoice_id: order_invoice.id,
-                                    status: 0
+                    const transaction = sequelize.transaction()
+                    try {
+                        const order = await Order.create(data_order_create, {
+                            transaction: transaction
+                        })
+                        if (order) {
+                            let itemDetails = [];
+                            invoices.map(async (invoice) => {
+                                let invSubtotal = 0
+                                const products = invoice.products
+                                for(let i = 0; i < products.length; i++) {
+                                    const get_prod = await Product.findByPk(products[i].product_id)
+                                    invSubtotal += Number(get_prod.price) * Number(products[i].quantity)
+                                }
+                                const data_invoice_create = {
+                                    code: orderUtils.create_invoice_code(),
+                                    seller_id: invoice.seller_id,
+                                    subtotal: invSubtotal,
+                                    shipping_cost: invoice.shipping_cost,
+                                    total: invSubtotal + Number(invoice.shipping_cost),
+                                    shipping_courier: invoice.shipping_courier,
+                                    status: 0,
+                                    order_id: order.id,
+                                }
+                                const order_invoice = await OrderInvoice.create(data_invoice_create, {
+                                    transaction: transaction
                                 })
-                                products.map(async (product) => {
-                                    const prod = await Product.findByPk(product.product_id)
-                                    const data_product_create = {
-                                        product_id: product.product_id,
+                                if (order_invoice) {
+                                    await OrderHistory.create({
                                         invoice_id: order_invoice.id,
-                                        quantity: product.quantity,
-                                        price: prod.price,
-                                        subtotal: Number(prod.price) * Number(product.quantity),
-                                        total_weight: Number(prod.weight) * Number(product.quantity)
-                                    }
-                                    await OrderProduct.create(data_product_create)
-                                    await prod.update({
-                                        stock: prod.stock - product.quantity
+                                        status: 0
+                                    },{
+                                        transaction: transaction
                                     })
-                                    itemDetails.push({
-                                        id: prod.id,
-                                        name: prod.name,
-                                        price: prod.price,
-                                        quantity: product.quantity,
-                                        category: 'Product'
+                                    products.map(async (product) => {
+                                        const prod = await Product.findByPk(product.product_id)
+                                        const data_product_create = {
+                                            product_id: product.product_id,
+                                            invoice_id: order_invoice.id,
+                                            quantity: product.quantity,
+                                            price: prod.price,
+                                            subtotal: Number(prod.price) * Number(product.quantity),
+                                            total_weight: Number(prod.weight) * Number(product.quantity)
+                                        }
+                                        await OrderProduct.create(data_product_create, {
+                                            transaction: transaction
+                                        })
+                                        await prod.update({
+                                            stock: prod.stock - product.quantity
+                                        },{
+                                            transaction: transaction
+                                        })
+                                        itemDetails.push({
+                                            id: prod.id,
+                                            name: prod.name,
+                                            price: prod.price,
+                                            quantity: product.quantity,
+                                            category: 'Product'
+                                        })
                                     })
-                                })
+                                }
+                            })
+                            const customerDetails = {
+                                first_name: user.name,
+                                email: user.email,
+                                phone: user.phone,
                             }
-                        })
-                        const customerDetails = {
-                            first_name: user.name,
-                            email: user.email,
-                            phone: user.phone,
-                        }
-                        const transactionDetails = {
-                            order_id: order.code,
-                            gross_amount: order.total_plus_tax
-                        }
-                        const midtransParams = {
-                            transaction_details: transactionDetails,
-                            // item_details: itemDetails,
-                            customer_details: customerDetails
-                        }
-
-                        const snap = orderUtils.configMidtrans()
-                        snap.createTransaction(midtransParams).then(async(transaction) => {
-                            await order.update({
-                                snap_url: transaction.redirect_url
+                            const transactionDetails = {
+                                order_id: order.code,
+                                gross_amount: order.total_plus_tax
+                            }
+                            const midtransParams = {
+                                transaction_details: transactionDetails,
+                                // item_details: itemDetails,
+                                customer_details: customerDetails
+                            }
+    
+                            const snap = orderUtils.configMidtrans()
+                            snap.createTransaction(midtransParams).then(async(transaction) => {
+                                await order.update({
+                                    snap_url: transaction.redirect_url
+                                },{
+                                    transaction: transaction
+                                })
+                                await Cart.destroy({
+                                    where: {
+                                        user_id: user.id
+                                    }
+                                })
+                                return res.json({
+                                    status: 'success',
+                                    data: {
+                                        code: order.code,
+                                        url: transaction.redirect_url
+                                    }
+                                })
+                            }).catch(err => {
+                                return res.status(503).json({
+                                    status: 'error',
+                                    message: err.message
+                                })
                             })
-                            await Cart.destroy({
-                                where: {
-                                    user_id: user.id
-                                }
-                            })
-                            return res.json({
-                                status: 'success',
-                                data: {
-                                    code: order.code,
-                                    url: transaction.redirect_url
-                                }
-                            })
-                        }).catch(err => {
-                            return res.status(503).json({
+                        } else {
+                            return res.status(409).json({
                                 status: 'error',
-                                message: err.message
+                                message: "Something wen't wrong!"
                             })
-                        })
-                    } else {
-                        return res.status(409).json({
+                        }
+                    } catch (error) {
+                        await transaction.rollback();
+                        return res.status(500).json({
                             status: 'error',
-                            message: "Something wen't wrong!"
+                            message: error?.message || `Failed to create order`
                         })
                     }
                 } else {

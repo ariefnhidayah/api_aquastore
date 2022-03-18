@@ -1,4 +1,4 @@
-const { Seller, sequelize } = require('../../models')
+const { Product, ProductImage, Category, Seller, City, Province, District, sequelize } = require('../../models')
 const bcrypt = require('bcrypt')
 const Validator = require('fastest-validator')
 const validator = new Validator()
@@ -10,6 +10,54 @@ const { JWT_SECRET_SELLER, JWT_ACCESS_TOKEN_EXPIRED } = process.env
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 const QueryTypes = Sequelize.QueryTypes
+
+Category.hasMany(Product, {
+    foreignKey: 'category_id'
+})
+
+Product.belongsTo(Category, {
+    foreignKey: 'category_id'
+})
+
+ProductImage.belongsTo(Product, {
+    foreignKey: 'product_id'
+})
+
+Product.hasMany(ProductImage, {
+    foreignKey: 'product_id'
+})
+
+Seller.hasMany(Product, {
+    foreignKey: 'seller_id'
+})
+
+Product.belongsTo(Seller, {
+    foreignKey: 'seller_id'
+})
+
+City.hasMany(Seller, {
+    foreignKey: 'city_id'
+})
+
+Seller.belongsTo(City, {
+    foreignKey: 'city_id'
+})
+
+Province.hasMany(Seller, {
+    foreignKey: 'province_id'
+})
+
+Seller.belongsTo(Province, {
+    foreignKey: 'province_id'
+})
+
+District.hasMany(Seller, {
+    foreignKey: 'district_id'
+})
+
+Seller.belongsTo(District, {
+    foreignKey: 'district_id'
+})
 
 module.exports = {
     register: async (req, res) => {
@@ -344,8 +392,6 @@ module.exports = {
         */
 
         const query = `SELECT
-        s.id, 
-        s.name,
         s.store_name,
         s.phone,
         s.courier,
@@ -383,6 +429,67 @@ module.exports = {
             status: "success",
             location: location.position,
             data: sellers
+        })
+    },
+
+    detail: async (req, res) => {
+        const seo_url = req.params.seo_url
+
+        const seller = await Seller.findOne({
+            attributes: ['id','store_name', 'email', 'phone', 'status', 'courier', 'address', 'seo_url', 'postcode'],
+            where: {
+                seo_url: seo_url
+            },
+            include: [
+                {
+                    model: District,
+                    attributes: ['name']
+                },
+                {
+                    model: City,
+                    attributes: ['name', 'type']
+                },
+                {
+                    model: Province,
+                    attributes: ['name']
+                },
+            ]
+        })
+
+        if (!seller) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Store not found!'
+            })
+        }
+
+        const products = await Product.findAll({
+            attributes: ['name', 'description', 'price', 'stock', 'seo_url', 'weight', 'thumbnail'],
+            where: {
+                seller_id: seller.id,
+                status: 1
+            },
+            include: [
+                {
+                    model: ProductImage,
+                    attributes: ['image']
+                },
+                {
+                    model: Category,
+                    attributes: ['name'],
+                    where: {
+                        status: 1
+                    }
+                },
+            ]
+        })
+
+        seller.setDataValue('Products', products)
+        seller.setDataValue('id', null)
+
+        return res.json({
+            status: 'success',
+            data: seller
         })
     }
 }
