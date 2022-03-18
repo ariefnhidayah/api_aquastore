@@ -355,6 +355,8 @@ module.exports = {
         CONCAT("Kecamatan ", d.name) as district,
         s.postcode,
         CONCAT(s.address, " Kec. ", d.name, ", ", c.type, " ", c.name, ", ", p.name, " ", s.postcode) as full_address,
+        s.latitude,
+        s.longitude,
         (
             6371 * (
                 2 * atan2(
