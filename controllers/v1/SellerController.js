@@ -380,7 +380,15 @@ module.exports = {
             })
         }
 
-        const { address } = req.query
+        let { address, page, limit } = req.query
+
+        if (!page) {
+            page = 1
+        }
+        if (!limit) {
+            limit = 20
+        }
+        let offset = (page - 1) * limit
 
         const location = await HereLocation.geocode(address)
         const {lat, lng} = location.position
@@ -422,7 +430,7 @@ module.exports = {
             left join provincies p on p.id = s.province_id
             left join cities c on c.id = s.city_id
             left join districts d on d.id = s.district_id
-            where s.status = 'active' order by distance asc limit 20`;
+            where s.status = 'active' order by distance asc limit ${offset}, ${limit}`;
 
         const sellers = await sequelize.query(query, {type: QueryTypes.SELECT, nest: true})
         return res.json({
