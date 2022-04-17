@@ -235,7 +235,7 @@ module.exports = {
                                         url: trf.redirect_url
                                     }
                                 })
-                            }).catch(err => {
+                            }).catch(async err => {
                                 await transaction.rollback()
                                 return res.status(503).json({
                                     status: 'error',
