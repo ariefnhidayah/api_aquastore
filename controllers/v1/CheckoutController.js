@@ -199,22 +199,22 @@ module.exports = {
                                     }
                                 }
                             }
-                            // const customerDetails = {
-                            //     first_name: user.name,
-                            //     email: user.email,
-                            //     phone: user.phone,
-                            // }
-                            // const transactionDetails = {
-                            //     order_id: order.code,
-                            //     gross_amount: order.total_plus_tax
-                            // }
-                            // const midtransParams = {
-                            //     transaction_details: transactionDetails,
-                            //     // item_details: itemDetails,
-                            //     customer_details: customerDetails
-                            // }
+                            const customerDetails = {
+                                first_name: user.name,
+                                email: user.email,
+                                phone: user.phone,
+                            }
+                            const transactionDetails = {
+                                order_id: order.code,
+                                gross_amount: order.total_plus_tax
+                            }
+                            const midtransParams = {
+                                transaction_details: transactionDetails,
+                                // item_details: itemDetails,
+                                customer_details: customerDetails
+                            }
     
-                            /*
+                            
                             const snap = orderUtils.configMidtrans()
                             snap.createTransaction(midtransParams).then(async(trf) => {
                                 await order.update({
@@ -242,7 +242,7 @@ module.exports = {
                                     message: err.message
                                 })
                             })
-                            */
+                            
                             await Cart.destroy({
                                 where: {
                                     user_id: user.id
