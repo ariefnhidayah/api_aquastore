@@ -267,7 +267,7 @@ module.exports = {
                         await transaction.rollback();
                         return res.status(500).json({
                             status: 'error',
-                            message: error?.message || `Failed to create order`
+                            message: error.message || `Failed to create order`
                         })
                     }
                 } else {
