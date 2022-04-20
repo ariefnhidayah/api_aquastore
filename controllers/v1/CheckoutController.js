@@ -137,7 +137,7 @@ module.exports = {
                         due_date: dateUtils.getDueDate(2),
                         snap_url: '',
                     }
-                    const transaction = await sequelize.transaction()
+                    const transaction = await sequelize.transaction({autocommit:false})
                     try {
                         const order = await Order.create(data_order_create, {
                             transaction: transaction
@@ -235,27 +235,13 @@ module.exports = {
                                         url: trf.redirect_url
                                     }
                                 })
-                            }).catch(async err => {
+                            })
+                            .catch(async err => {
                                 await transaction.rollback()
                                 return res.status(503).json({
                                     status: 'error',
                                     message: err.message
                                 })
-                            })
-                            
-                            await Cart.destroy({
-                                where: {
-                                    user_id: user.id
-                                },
-                                transaction: transaction
-                            })
-                            await transaction.commit()
-                            return res.json({
-                                status: 'success',
-                                data: {
-                                    code: order.code,
-                                    // url: "google.com"
-                                }
                             })
                         } else {
                             return res.status(409).json({
