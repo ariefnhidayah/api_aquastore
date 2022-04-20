@@ -66,7 +66,7 @@ module.exports = {
         let offset = (page - 1) * limit
 
         products = await Product.findAll({
-            attributes: ['name', 'description', 'price', 'stock', 'seo_url', 'weight', 'thumbnail'],
+            attributes: ['name', 'description', 'price', 'stock', 'seo_url', 'weight', 'thumbnail', 'seller_id'],
             where: {
                 [Op.and]: [
                     {status: 1},
