@@ -50,19 +50,26 @@ module.exports = {
                     phone: req.body.phone
                 }
 
-                const newUser = await User.create(data)
-                const token = jwt.sign({ data: newUser }, JWT_SECRET, { expiresIn: JWT_ACCESS_TOKEN_EXPIRED })
-                return res.json({
-                    status: 'success',
-                    data: {
-                        token,
-                        email: data.email,
-                        phone: data.phone,
-                        name: data.name,
-                        status: newUser.status,
-                        balance: newUser.balance
-                    }
-                })
+                try {
+                    const newUser = await User.create(data)
+                    const token = jwt.sign({ data: newUser }, JWT_SECRET, { expiresIn: JWT_ACCESS_TOKEN_EXPIRED })
+                    return res.json({
+                        status: 'success',
+                        data: {
+                            token,
+                            email: data.email,
+                            phone: data.phone,
+                            name: data.name,
+                            status: newUser.status,
+                            balance: newUser.balance
+                        }
+                    })   
+                } catch (error) {
+                    return res.json({
+                        status: 'error',
+                        message: error.toString()
+                    })
+                }
             }
         }
     },
