@@ -58,7 +58,7 @@ module.exports = {
                 },
             })
             if (product) {
-                if (quantity <= product.stock) {
+                if (true) {
                     const cart = await Cart.findOne({
                         where: {
                             product_id,
@@ -273,6 +273,53 @@ module.exports = {
         return res.json({
             status: "success",
             data: carts
+        })
+    },
+    check_stock: async (req, res) => {
+        const user = req.user.data
+        const carts = await Cart.findAll({
+            where: {
+                user_id: user.id,
+            },
+            attributes: ['quantity', 'product_id', 'seller_id'],
+            include: [
+                {
+                    model: Seller,
+                    attributes: ['store_name', 'courier', 'id'],
+                    where: {
+                        status: 'active'
+                    },
+                    include: [
+                        {
+                            model: City,
+                            attributes: ['type', 'name']
+                        },
+                        {
+                            model: Province,
+                            attributes: ['name']
+                        }
+                    ],
+                },
+                {
+                    model: Product,
+                    attributes: ['name', 'price', 'stock', 'seo_url', 'weight', 'thumbnail'],
+                    where: {
+                        status: 1
+                    }
+                }
+            ]
+        })
+
+        const out_of_stock = []
+        for (const cart of carts) {
+            if (cart.quantity > cart.Product.stock) {
+                out_of_stock.push(cart.product_id)
+            }
+        }
+
+        return res.json({
+            status: "success",
+            data: out_of_stock
         })
     }
 }
