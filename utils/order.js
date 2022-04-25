@@ -51,9 +51,9 @@ module.exports = {
   },
   configMidtrans: () => {
     const snap = new midtransClient.Snap({
-      isProduction: MIDTRANS_PRODUCTION == 'true' ? true : false,
+      isProduction: MIDTRANS_PRODUCTION == 'true',
       serverKey: MIDTRANS_SERVER_KEY,
-      clientKey: MIDTRANS_CLIENT_KEY
+      // clientKey: MIDTRANS_CLIENT_KEY
     });
     return snap
   },
