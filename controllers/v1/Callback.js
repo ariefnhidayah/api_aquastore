@@ -17,7 +17,8 @@ module.exports = {
         const fraudStatus = data.fraud_status
 
         await PaymentMeta.create({
-            data: JSON.stringify(data)
+            data: JSON.stringify(data),
+            type: 'callback_midtrans'
         })
 
         if (signatureKey != mySignatureKey) {

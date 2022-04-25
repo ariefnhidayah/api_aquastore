@@ -8,7 +8,8 @@ const {
   Seller,
   OrderHistory,
   Category,
-  sequelize
+  sequelize,
+  PaymentMeta
 } = require("../../models");
 const axios = require("axios");
 const dateUtils = require('../../utils/date')
@@ -217,6 +218,14 @@ module.exports = {
                             
                             const snap = orderUtils.configMidtrans()
                             snap.createTransaction(midtransParams).then(async(trf) => {
+                                await PaymentMeta.create({
+                                    data: JSON.stringify(midtransParams),
+                                    type: 'request_midtrans'
+                                })
+                                await PaymentMeta.create({
+                                    data: JSON.stringify(trf),
+                                    type: 'response_midtrans'
+                                })
                                 await order.update({
                                     snap_url: trf.redirect_url
                                 },{
