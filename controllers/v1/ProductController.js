@@ -70,6 +70,9 @@ module.exports = {
             where: {
                 [Op.and]: [
                     {status: 1},
+                    {stock: {
+                        [Op.gt]: 0
+                    }},
                     {
                         name: {
                             [Op.like]: `%${q}%`
