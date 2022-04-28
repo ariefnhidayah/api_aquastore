@@ -90,9 +90,7 @@ module.exports = {
             },
             offset: offset,
             limit: Number(limit),
-            order: [
-                ['id', 'desc']
-            ],
+            order: sequelize.random(),
             include: [
                 {
                     model: Category,
